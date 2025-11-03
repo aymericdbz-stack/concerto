@@ -6,14 +6,12 @@ import type { Database } from "@/types/supabase";
 
 export const runtime = "nodejs";
 
-interface RouteContext {
-  params: {
-    id?: string;
-  };
-}
-
-export async function GET(_request: Request, { params }: RouteContext) {
-  const registrationId = params.id?.trim();
+export async function GET(
+  _request: Request,
+  context: RouteContext<"/api/registrations/[id]/ticket">
+) {
+  const { id } = await context.params;
+  const registrationId = id?.trim();
 
   if (!registrationId) {
     return NextResponse.json({ error: "Identifiant d'inscription manquant." }, { status: 400 });
@@ -88,8 +86,12 @@ export async function GET(_request: Request, { params }: RouteContext) {
       qrDataUrl: qrDataUrl ?? "",
       registrationId,
     });
+    const pdfArrayBuffer = pdfBuffer.buffer.slice(
+      pdfBuffer.byteOffset,
+      pdfBuffer.byteOffset + pdfBuffer.byteLength
+    ) as ArrayBuffer;
 
-    return new Response(pdfBuffer, {
+    return new Response(pdfArrayBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

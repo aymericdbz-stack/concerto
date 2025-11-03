@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import QRCode from "qrcode";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase-server";
 import { generateTicketPdf, sendTicketEmail } from "@/lib/ticketing";
+import type { Database } from "@/types/supabase";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
           .from("registrations")
           .select("*")
           .eq("id", registrationId)
-          .single();
+          .single<Database["public"]["Tables"]["registrations"]["Row"]>();
 
         if (fetchError || !registration) {
           console.error(
@@ -106,7 +107,7 @@ export async function POST(request: Request) {
             })
             .eq("id", registrationId)
             .select()
-            .single();
+            .single<Database["public"]["Tables"]["registrations"]["Row"]>();
 
           if (updateError || !updatedRegistration) {
             console.error(

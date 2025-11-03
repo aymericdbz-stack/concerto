@@ -15,12 +15,6 @@ const REQUIRED_ENV_VARS = [
 ] as const;
 type EnvKey = (typeof REQUIRED_ENV_VARS)[number];
 
-interface RouteContext {
-  params: {
-    id?: string;
-  };
-}
-
 function assertEnvVars(env: NodeJS.ProcessEnv): asserts env is NodeJS.ProcessEnv & Record<EnvKey, string> {
   const missing = REQUIRED_ENV_VARS.filter((key) => !env[key]?.length);
 
@@ -29,11 +23,15 @@ function assertEnvVars(env: NodeJS.ProcessEnv): asserts env is NodeJS.ProcessEnv
   }
 }
 
-export async function POST(_request: Request, { params }: RouteContext) {
+export async function POST(
+  _request: Request,
+  context: RouteContext<"/api/registrations/[id]/send-ticket">
+) {
   try {
     assertEnvVars(process.env);
 
-    const registrationId = params.id?.trim();
+    const { id } = await context.params;
+    const registrationId = id?.trim();
     if (!registrationId) {
       return NextResponse.json({ error: "Identifiant d'inscription manquant." }, { status: 400 });
     }

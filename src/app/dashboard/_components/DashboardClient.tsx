@@ -62,6 +62,7 @@ export function DashboardClient({ initialRegistrations }: DashboardClientProps) 
       return;
     }
 
+    const userId = user.id;
     let isMounted = true;
 
     async function refreshRegistrations() {
@@ -69,7 +70,7 @@ export function DashboardClient({ initialRegistrations }: DashboardClientProps) 
         const { data, error } = await supabase
           .from("registrations")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -217,13 +218,14 @@ export function DashboardClient({ initialRegistrations }: DashboardClientProps) 
       return;
     }
 
+    const userId = user.id;
     let isCancelled = false;
 
     async function refreshUserRegistrations() {
       const { data, error } = await supabase
         .from("registrations")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
       if (!error && data) {

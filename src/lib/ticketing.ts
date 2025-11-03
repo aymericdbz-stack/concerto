@@ -192,11 +192,18 @@ export async function sendTicketEmail({
   ticketPdf,
   registrationId,
 }: TicketEmailPayload) {
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
+
+  if (!apiKey || !fromEmail) {
+    throw new Error("Configuration Resend manquante.");
+  }
+
+  const resend = new Resend(apiKey);
   const formattedAmount = formatCurrency(amount);
 
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL,
+    from: fromEmail,
     to,
     subject: `Ta place pour ${MAIN_EVENT.title}`,
     html: `
